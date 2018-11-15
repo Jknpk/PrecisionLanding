@@ -29,6 +29,7 @@
 #define RANGE 2
 #define RANGE_REPORT 3
 #define RANGE_FAILED 255
+#define DEVICE_ADDRESS 3
 // message flow state
 volatile byte expectedMsgId = POLL;
 // message sent/received state
@@ -46,7 +47,7 @@ DW1000Time timeRangeReceived;
 // last computed range/time
 DW1000Time timeComputedRange;
 // data buffer
-#define LEN_DATA 16
+#define LEN_DATA 17
 byte data[LEN_DATA];
 // reset line to the chip
 int RST = 9;
@@ -67,7 +68,7 @@ void setup() {
   // general configuration
   DW1000.newConfiguration();
   DW1000.setDefaults();
-  DW1000.setDeviceAddress(3);
+  DW1000.setDeviceAddress(DEVICE_ADDRESS);
   DW1000.setNetworkId(10);
   DW1000.enableMode(DW1000.MODE_LONGDATA_RANGE_LOWPOWER);
   DW1000.commitConfiguration();
@@ -127,6 +128,7 @@ void transmitRangeReport(float curRange) {
   DW1000.newTransmit();
   DW1000.setDefaults();
   data[0] = RANGE_REPORT;
+  data[16] = DEVICE_ADDRESS;
   // write final ranging result
   memcpy(data+1, &curRange, 4);
   DW1000.setData(data, LEN_DATA);

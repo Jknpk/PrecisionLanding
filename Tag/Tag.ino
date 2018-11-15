@@ -29,6 +29,7 @@
 #define RANGE 2
 #define RANGE_REPORT 3
 #define RANGE_FAILED 255
+
 // message flow state
 volatile byte expectedMsgId = POLL_ACK;
 // message sent/received state
@@ -39,7 +40,7 @@ DW1000Time timePollSent;
 DW1000Time timePollAckReceived;
 DW1000Time timeRangeSent;
 // data buffer
-#define LEN_DATA 16
+#define LEN_DATA 17
 byte data[LEN_DATA];
 // reset line to the chip
 int RST = 9;
@@ -176,10 +177,11 @@ void loop() {
       noteActivity();
     } else if(msgId == RANGE_REPORT) {
       expectedMsgId = POLL_ACK;
+      byte incoming_device_address = data[16];
       float curRange;
       memcpy(&curRange, data+1, 4);
       //float roundedRange = round(curRange*10.)/10.;
-      Serial.print("Current Range: "); Serial.println(curRange);
+      Serial.print("Anchor "); Serial.print(incoming_device_address); Serial.print(": Current Range: "); Serial.println(curRange);
       
       transmitPoll();
       noteActivity();
